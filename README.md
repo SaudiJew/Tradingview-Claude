@@ -1,6 +1,6 @@
 # TradingView-Claude Integration
 
-A Python-based integration for handling TradingView webhooks and automating trading signals. This implementation provides a secure and extensible foundation for building automated trading systems based on TradingView alerts.
+A Python-based integration for handling TradingView webhooks and automating trading signals, with built-in support for Binance trading.
 
 ## Features
 
@@ -8,7 +8,9 @@ A Python-based integration for handling TradingView webhooks and automating trad
 - Type-safe signal processing using dataclasses
 - Comprehensive error handling and logging
 - Flexible extension points for custom trading logic
+- Built-in Binance integration (supports both mainnet and testnet)
 - Flask-based web server for receiving webhooks
+- Comprehensive test suite
 
 ## Installation
 
@@ -23,9 +25,15 @@ cd Tradingview-Claude
 pip install -r requirements.txt
 ```
 
-3. Set your secret key:
+3. Set up environment variables:
 ```bash
+# Required for TradingView webhook validation
 export TRADINGVIEW_SECRET_KEY=your-secret-key
+
+# Required for Binance integration
+export BINANCE_API_KEY=your-binance-api-key
+export BINANCE_API_SECRET=your-binance-api-secret
+export USE_BINANCE_TESTNET=true  # Set to false for mainnet
 ```
 
 ## Usage
@@ -49,12 +57,40 @@ python tradingview_integration.py
     "strategy": "YOUR_STRATEGY_NAME",
     "parameters": {
         "timeframe": "{{interval}}",
-        "volume": {{volume}}
+        "volume": {{volume}},
+        "position_size": 1.0
     }
 }
 ```
 
-### Implementing Custom Trading Logic
+### Using Binance Integration
+
+1. Run the Binance example:
+```bash
+python binance_example.py
+```
+
+The Binance integration provides:
+- Automatic order execution on Binance
+- Support for both mainnet and testnet
+- Position size management
+- Error handling and logging
+
+Example TradingView alert for Binance:
+```json
+{
+    "symbol": "BTCUSDT",
+    "action": "BUY",
+    "price": {{close}},
+    "strategy": "RSI_Strategy",
+    "parameters": {
+        "position_size": 0.01,
+        "timeframe": "1h"
+    }
+}
+```
+
+### Custom Trading Logic
 
 Extend the `TradingViewIntegration` class and override the `handle_trading_signal` method:
 
@@ -71,11 +107,33 @@ class MyTradingStrategy(TradingViewIntegration):
             print(f"Executing SELL for {signal.symbol} at {signal.price}")
 ```
 
+## Testing
+
+The project includes a comprehensive test suite using pytest. To run the tests:
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage report
+pytest --cov=.
+
+# Run specific test file
+pytest tests/test_binance_integration.py
+```
+
+The test suite includes:
+- Unit tests for TradingView integration
+- Unit tests for Binance integration
+- End-to-end integration tests
+- Mock tests for external dependencies
+
 ## Security
 
 - Webhook endpoints are protected with HMAC signature validation
 - Environment variables are used for sensitive configuration
 - Comprehensive input validation and error handling
+- Testnet support for safe testing
 
 ## Contributing
 
